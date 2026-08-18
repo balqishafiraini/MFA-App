@@ -48,52 +48,8 @@ cd Backend
 
 Tests use a software EC P-256 key in place of the Secure Enclave — from the backend's point of view the two are identical, since all the server ever sees is the public key and the signature.
 
-## 3. Manual Testing with curl
 
-A full `register` → `challenge` → sign with `openssl` → `verify` example (useful for debugging the backend without needing to build the iOS app). The backend must already be running.
-
-```bash
-# 1. Generate a "device" keypair with openssl (standing in for the iOS Secure Enclave for this test)
-openssl ecparam -name prime256v1 -genkey -noout -out /tmp/client_priv.pem
-openssl ec -in /tmp/client_priv.pem -pubout -out /tmp/client_pub.pem
-
-# 2. Convert the public key to raw X9.63 base64 (the format the backend expects)
-PUBKEY=$(./Backend/venv/bin/python3 - <<'EOF'
-from cryptography.hazmat.primitives import serialization
-import base64
-pub = serialization.load_pem_public_key(open("/tmp/client_pub.pem", "rb").read())
-raw = pub.public_bytes(serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint)
-print(base64.b64encode(raw).decode())
-EOF
-)
-FPRINT=$(echo -n "demo-device-fingerprint-seed" | shasum -a 256 | cut -d' ' -f1)
-
-# 3. Register
-KEYID=$(curl -sk -X POST https://localhost:8443/register -H "Content-Type: application/json" \
-  -d "{\"deviceId\":\"d1\",\"publicKey\":\"$PUBKEY\",\"fingerprint\":\"$FPRINT\"}" | python3 -c "import json,sys; print(json.load(sys.stdin)['keyId'])")
-
-# 4. Get a challenge
-CHAL=$(curl -sk "https://localhost:8443/challenge?keyId=$KEYID")
-CHALLENGE=$(echo "$CHAL" | python3 -c "import json,sys; print(json.load(sys.stdin)['challenge'])")
-NONCE=$(echo "$CHAL" | python3 -c "import json,sys; print(json.load(sys.stdin)['nonce'])")
-
-# 5. Sign challenge+nonce
-echo -n "${CHALLENGE}${NONCE}" > /tmp/message.bin
-openssl dgst -sha256 -sign /tmp/client_priv.pem -out /tmp/sig.bin /tmp/message.bin
-SIG=$(base64 -i /tmp/sig.bin | tr -d '\n')
-
-# 6. Verify
-curl -sk -X POST https://localhost:8443/verify -H "Content-Type: application/json" \
-  -d "{\"keyId\":\"$KEYID\",\"signature\":\"$SIG\",\"fingerprint\":\"$FPRINT\"}"
-# -> {"verified": true}
-
-# 7. Try resending the same signature (replay) -> rejected
-curl -sk -X POST https://localhost:8443/verify -H "Content-Type: application/json" \
-  -d "{\"keyId\":\"$KEYID\",\"signature\":\"$SIG\",\"fingerprint\":\"$FPRINT\"}"
-# -> 401 {"detail":"No valid challenge pending for this keyId"}
-```
-
-## 4. Running the iOS App
+## 3. Running the iOS App
 
 Minimum iOS 17.0, built with Xcode 16+.
 
@@ -126,11 +82,10 @@ The **Security** screen has a few actions worth testing: **Replace My Key** (key
   restart the app, the "Server Identity Locked" check on the Set Up screen
   should turn red and the connection to the backend should be rejected.
 - **Key rotation**: on the Security screen, tap **Replace My Key**, wait for
-  success, Log Out, then log back in — it should still be able to log in
+  success, Log Out, then log back in. It should still be able to log in
   (confirming the new key is what's being used, not the old one).
 - **Reinstall**: uninstall the app from the iPhone, reinstall it, it should
   go back to the **Set Up** screen (not Security), and re-registering should
   get a new `keyId` from the server.
 - **Rate limiting**: from the terminal, send rapid repeated `/challenge`
-  requests (see part 3) for the same keyId — request #11 onward should get
-  a `429`.
+  requests for the same keyId
