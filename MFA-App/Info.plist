@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Digunakan untuk menandatangani challenge autentikasi menggunakan private key yang tersimpan di Secure Enclave.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Digunakan untuk menghubungi backend demo yang berjalan di jaringan lokal saat development.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>cydia</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+
+# Python / backend
+Backend/venv/
+**/__pycache__/
+.pytest_cache/
+*.pyc
+
+# local dev TLS cert/key for SSL pinning demo (regenerate with Backend/certs/generate.sh)
+Backend/certs/*.pem
