@@ -1,4 +1,4 @@
-# MFA-App — Hardware-backed Passwordless Authentication
+# MFA-App: Hardware-backed Passwordless Authentication
 
 Demo app for passwordless / MFA authentication using a **hardware-backed asymmetric key** (Secure Enclave), similar to the WebAuthn/FIDO2 flow but implemented specifically for iOS.
 
