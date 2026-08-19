@@ -14,24 +14,47 @@ struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
 
     var body: some View {
-        VStack {
-            Spacer()
+        ZStack(alignment: .bottomTrailing) {
+            VStack {
+                Spacer()
 
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.tint)
-                .padding(.bottom, 8)
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.tint)
+                    .padding(.bottom, 8)
 
-            content
+                content
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            #if DEBUG
+            debugUnregisterButton
+            #endif
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onChange(of: viewModel.state) { _, newValue in
             handle(newValue)
         }
     }
+
+    #if DEBUG
+    private var debugUnregisterButton: some View {
+        Button {
+            viewModel.showUnregisterConfirm = true
+        } label: {
+            Image(systemName: "info.circle.fill")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(24)
+        .unregisterConfirmation(isPresented: $viewModel.showUnregisterConfirm) {
+            viewModel.unregister()
+            onUnregistered()
+        }
+    }
+    #endif
 
     private func handle(_ state: ViewState) {
         switch state {

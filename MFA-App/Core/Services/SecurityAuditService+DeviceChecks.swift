@@ -84,7 +84,7 @@ extension SecurityAuditService {
 
     private static func tamperingStatus() -> CheckStatus {
         #if DEBUG
-        return .passed("Skipped while testing from Xcode")
+        return .passed("Skipped while testing from Simulator")
         #else
         if DeviceIntegrityService.isDebuggerAttached() {
             return .failed("Something is inspecting the app")

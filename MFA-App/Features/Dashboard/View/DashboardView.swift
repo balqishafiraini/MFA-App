@@ -79,7 +79,7 @@ struct DashboardView: View {
         } header: {
             Text("Things You Can Try")
         } footer: {
-            Text("Tap a row to run it. Replacing your key asks for Face ID and you stay logged in — you keep the same account on the server.")
+            Text("Tap a row to run it. Replacing your key asks for Face ID and you stay logged in.")
         }
     }
 

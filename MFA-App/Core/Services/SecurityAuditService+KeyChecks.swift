@@ -75,7 +75,7 @@ extension SecurityAuditService {
             id: "localStorage",
             title: "Nothing Secret Left on Disk",
             status: leaked.isEmpty
-                ? .passed("Checked app storage — nothing sensitive saved there")
+                ? .passed("App storage successfuly checked and found no sensitive values")
                 : .failed("Found sensitive values saved: \(leaked.joined(separator: ", "))")
         )
     }

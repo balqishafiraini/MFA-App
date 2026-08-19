@@ -14,7 +14,16 @@ final class LoginViewModel: ObservableObject {
     @Published private(set) var currentStep: AuthStep?
 
     private let authService = AuthenticationService.shared
+
+    #if DEBUG
+    @Published var showUnregisterConfirm = false
+
     private let registerService = RegisterService.shared
+
+    func unregister() {
+        registerService.resetRegistration()
+    }
+    #endif
 
     func authenticate() {
         state = .loading
