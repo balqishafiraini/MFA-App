@@ -5,7 +5,6 @@ from app.routers import challenge, register, rotate, verify
 
 app = FastAPI(title="MFA Demo Backend")
 
-# Local-dev only: lets the iOS app (any origin) hit this server during testing.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

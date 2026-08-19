@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.post("/register", response_model=RegisterResponse)
 def register(req: RegisterRequest, request: Request) -> RegisterResponse:
-    # Limited per IP: there is no account yet to limit against.
     if not check_rate_limit(f"register:{client_ip(request)}"):
         raise HTTPException(status_code=429, detail="Too many registration attempts, try again later.")
 

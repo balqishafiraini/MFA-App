@@ -10,8 +10,6 @@ router = APIRouter()
 
 @router.post("/verify", response_model=VerifyResponse)
 def verify(req: VerifyRequest) -> VerifyResponse:
-    # Limited per keyId rather than per IP, so brute forcing one account stays
-    # blocked even when the attempts are spread across many addresses.
     if not check_rate_limit(f"verify:{req.keyId}"):
         raise HTTPException(status_code=429, detail="Too many verification attempts, try again later.")
 
@@ -19,7 +17,6 @@ def verify(req: VerifyRequest) -> VerifyResponse:
     if registered is None:
         raise HTTPException(status_code=404, detail="Unknown keyId")
 
-    # Consumed before any other check, so a failed attempt still burns the challenge.
     pending = storage.consume_challenge(req.keyId)
     if pending is None:
         raise HTTPException(status_code=401, detail="No valid challenge pending for this keyId")

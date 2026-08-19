@@ -1,9 +1,3 @@
-"""Fixed-window rate limiting, in memory.
-
-Enough for a demo. A real deployment would keep these counters in Redis so they
-survive restarts and are shared across instances.
-"""
-
 import time
 
 from fastapi import Request
@@ -25,5 +19,4 @@ def check_rate_limit(key: str, max_requests: int = 10, window_seconds: int = 60)
 
 
 def client_ip(request: Request) -> str:
-    """`request.client` is None for some ASGI transports, so it can't be indexed blindly."""
     return request.client.host if request.client else "unknown"

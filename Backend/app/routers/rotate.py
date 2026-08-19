@@ -24,9 +24,6 @@ def rotate(req: RotateRequest) -> RotateResponse:
     if pending is None:
         raise HTTPException(status_code=401, detail="No valid challenge pending for this keyId")
 
-    # The signature must come from the OLD key. That is what proves the request
-    # is really from the registered device, rather than someone simply posting a
-    # public key of their own.
     message = (pending.challenge + pending.nonce).encode()
     if not verify_signature(registered.public_key_b64, message, req.signature):
         raise HTTPException(status_code=401, detail="Invalid signature")
